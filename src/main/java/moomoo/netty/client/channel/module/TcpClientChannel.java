@@ -53,7 +53,8 @@ public class TcpClientChannel {
                 .option(ChannelOption.SO_RCVBUF, config.getNettyRecvBufSize())
                 .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                 .option(ChannelOption.SO_REUSEADDR, true)
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 1000)
+//                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 1000)
+                .option(ChannelOption.SO_KEEPALIVE, true)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel socketChannel) {
@@ -114,17 +115,16 @@ public class TcpClientChannel {
 
     ////////////////////////////////////////////////////////////////////////////////
 
-    public void sendMessage(String message) {
-        closeChannel();
-        byte[] bytesMsg = message.getBytes(StandardCharsets.UTF_8);
+    public void sendMessage(byte[] message) {
+//        closeChannel();
         ByteBuf byteBuf = NettyUtil.createPooledHeapByteBuf(16);
-        byteBuf.writeBytes(bytesMsg);
-        openChannel();
+        byteBuf.writeBytes(message);
+//        openChannel();
         if (channel != null) {
             try {
                 channel.writeAndFlush(byteBuf);
                 String logMessage = byteBuf.toString(StandardCharsets.UTF_8);
-                logger.debug("({}) ({}:{}) Send the request. [\n{}\n]", channelId, targetIp, targetPort, logMessage);
+                logger.debug("({}) ({}:{}) Send the request. [\n{}\n]", channelId, targetIp, targetPort, message);
             } catch (Exception e) {
                 logger.error("TcpClientChannel.sendMessage.Exception ", e);
             }

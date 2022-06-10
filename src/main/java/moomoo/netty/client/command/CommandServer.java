@@ -2,11 +2,14 @@ package moomoo.netty.client.command;
 
 import moomoo.netty.client.channel.NettyChannelManager;
 import moomoo.netty.client.command.handler.ControlCommandHandler;
+import moomoo.netty.client.message.TcpMngLoginReqMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
+import static moomoo.netty.client.command.base.CommandType.COMMAND_LOGIN_REQ;
 import static moomoo.netty.client.command.base.CommandType.COMMAND_Q;
 import static moomoo.netty.client.command.base.PrintMessage.*;
 
@@ -49,10 +52,20 @@ public class CommandServer implements Runnable {
      * command를 입력받고 어떤 command인지 파싱하는 메서드
      */
     public void commandInput(String inputCommand) {
-        if (inputCommand.equals(COMMAND_Q)) {
-            ControlCommandHandler.processQuitCommand();
-        } else {
-            NettyChannelManager.getInstance().getTcpClientChannel().sendMessage(inputCommand);
+        switch (inputCommand) {
+            case COMMAND_Q:
+                ControlCommandHandler.processQuitCommand();
+                break;
+            case COMMAND_LOGIN_REQ:
+                TcpMngLoginReqMessage loginReqMessage = new TcpMngLoginReqMessage(0xbbbb, 0xaaaa, 1);
+                log.debug("{}", loginReqMessage);
+
+                NettyChannelManager.getInstance().getTcpClientChannel().sendMessage(loginReqMessage.getData());
+                break;
+            default:
+                byte[] bytesMsg = inputCommand.getBytes(StandardCharsets.UTF_8);
+                NettyChannelManager.getInstance().getTcpClientChannel().sendMessage(bytesMsg);
+                break;
         }
     }
 
