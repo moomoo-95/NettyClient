@@ -1,8 +1,8 @@
 package moomoo.netty.client.message.exception;
 
-public class MessageHeaderException extends Exception{
+public class TcpMessageException extends Exception{
 
-    public MessageHeaderException(String message) {
+    public TcpMessageException(String message) {
         super(message);
     }
 

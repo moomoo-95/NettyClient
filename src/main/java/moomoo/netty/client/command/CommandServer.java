@@ -3,6 +3,7 @@ package moomoo.netty.client.command;
 import moomoo.netty.client.channel.NettyChannelManager;
 import moomoo.netty.client.command.handler.ControlCommandHandler;
 import moomoo.netty.client.message.TcpMngLoginReqMessage;
+import moomoo.netty.client.util.ByteUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,8 +58,13 @@ public class CommandServer implements Runnable {
                 ControlCommandHandler.processQuitCommand();
                 break;
             case COMMAND_LOGIN_REQ:
-                TcpMngLoginReqMessage loginReqMessage = new TcpMngLoginReqMessage(0xbbbb, 0xaaaa, 1);
-                log.debug("{}", loginReqMessage);
+                int systemId = 0xbbbb;
+                long processArg = 0xaaaa;
+                long index = 1;
+                TcpMngLoginReqMessage loginReqMessage = new TcpMngLoginReqMessage(systemId, processArg, index);
+                log.debug("{} {} {}", ByteUtil.intToBytes(systemId, true), ByteUtil.longToBytes(processArg, true), ByteUtil.longToBytes(index, true));
+                log.debug("login req msg : {}", loginReqMessage);
+                log.debug("login req byt : {}", loginReqMessage.getData());
 
                 NettyChannelManager.getInstance().getTcpClientChannel().sendMessage(loginReqMessage.getData());
                 break;

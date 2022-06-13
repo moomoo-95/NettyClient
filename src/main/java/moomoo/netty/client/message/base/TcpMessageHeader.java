@@ -1,50 +1,50 @@
 package moomoo.netty.client.message.base;
 
-import moomoo.netty.client.message.exception.MessageHeaderException;
+import moomoo.netty.client.message.exception.TcpMessageException;
 import moomoo.netty.client.util.ByteUtil;
 
 import static moomoo.netty.client.message.base.TcpMessageType.*;
 
 public class TcpMessageHeader {
 
-    private final int length;
-    private final int msgId;
-    private final int systemId;
+    private final int length;       // unsigned 16 bite
+    private final int msgId;        // unsigned 16 bite
+    private final int systemId;     // unsigned 16 bite
 
 
-    public TcpMessageHeader(byte[] data) throws MessageHeaderException {
-        if (data.length >= HEADER_SIZE) {
+    public TcpMessageHeader(byte[] data) throws TcpMessageException {
+        if (data.length == HEADER_SIZE) {
             int index = 0;
 
             byte[] frameStartByteData = new byte[ByteUtil.NUM_BYTES_IN_INT];
-            System.arraycopy(data, index, frameStartByteData, 0, frameStartByteData.length);
+            System.arraycopy(data, index, frameStartByteData, ByteUtil.NUM_BYTES_IN_SHORT, frameStartByteData.length - ByteUtil.NUM_BYTES_IN_SHORT);
             int checkMsg = ByteUtil.bytesToInt(frameStartByteData, true);
             if (checkMsg != FRAME_START) {
                 this.length = -1;
                 this.msgId = -1;
                 this.systemId = -1;
-                throw new MessageHeaderException("[TCP Message Header] Fail to create the header. FrameStart: (" + checkMsg + ")");
+                throw new TcpMessageException("[TCP Message Header] Fail to create the header. FrameStart: (" + checkMsg + ")");
             }
-            index += frameStartByteData.length;
+            index += ByteUtil.NUM_BYTES_IN_SHORT;
 
             byte[] lengthByteData = new byte[ByteUtil.NUM_BYTES_IN_INT];
-            System.arraycopy(data, index, lengthByteData, 0, lengthByteData.length);
+            System.arraycopy(data, index, lengthByteData, ByteUtil.NUM_BYTES_IN_SHORT, lengthByteData.length - ByteUtil.NUM_BYTES_IN_SHORT);
             this.length = ByteUtil.bytesToInt(lengthByteData, true);
-            index += lengthByteData.length;
+            index += ByteUtil.NUM_BYTES_IN_SHORT;
 
             byte[] msgIdByteData = new byte[ByteUtil.NUM_BYTES_IN_INT];
-            System.arraycopy(data, index, msgIdByteData, 0, msgIdByteData.length);
+            System.arraycopy(data, index, msgIdByteData, ByteUtil.NUM_BYTES_IN_SHORT, msgIdByteData.length - ByteUtil.NUM_BYTES_IN_SHORT);
             this.msgId = ByteUtil.bytesToInt(msgIdByteData, true);
-            index += msgIdByteData.length;
+            index += ByteUtil.NUM_BYTES_IN_SHORT;
 
             byte[] systemIdByteData = new byte[ByteUtil.NUM_BYTES_IN_INT];
-            System.arraycopy(data, index, systemIdByteData, 0, systemIdByteData.length);
+            System.arraycopy(data, index, systemIdByteData, ByteUtil.NUM_BYTES_IN_SHORT, systemIdByteData.length - ByteUtil.NUM_BYTES_IN_SHORT);
             this.systemId = ByteUtil.bytesToInt(systemIdByteData, true);
         } else {
             this.length = -1;
             this.msgId = -1;
             this.systemId = -1;
-            throw new MessageHeaderException("[TCP Message Header] Fail to create the header. Data length: (" + data.length + ")");
+            throw new TcpMessageException("[TCP Message Header] Fail to create the header. Data length: (" + data.length + ")");
         }
 
     }
@@ -60,19 +60,19 @@ public class TcpMessageHeader {
         int index = 0;
 
         byte[] frameStartByteData = ByteUtil.intToBytes(FRAME_START, true);
-        System.arraycopy(frameStartByteData, 0, data, index, frameStartByteData.length);
-        index += frameStartByteData.length;
+        System.arraycopy(frameStartByteData, ByteUtil.NUM_BYTES_IN_SHORT, data, index, frameStartByteData.length - ByteUtil.NUM_BYTES_IN_SHORT);
+        index += ByteUtil.NUM_BYTES_IN_SHORT;
 
         byte[] lengthByteData = ByteUtil.intToBytes(length, true);
-        System.arraycopy(lengthByteData, 0, data, index, lengthByteData.length);
-        index += lengthByteData.length;
+        System.arraycopy(lengthByteData, ByteUtil.NUM_BYTES_IN_SHORT, data, index, lengthByteData.length - ByteUtil.NUM_BYTES_IN_SHORT);
+        index += ByteUtil.NUM_BYTES_IN_SHORT;
 
         byte[] msgIdByteData = ByteUtil.intToBytes(msgId, true);
-        System.arraycopy(msgIdByteData, 0, data, index, msgIdByteData.length);
-        index += msgIdByteData.length;
+        System.arraycopy(msgIdByteData, ByteUtil.NUM_BYTES_IN_SHORT, data, index, msgIdByteData.length - ByteUtil.NUM_BYTES_IN_SHORT);
+        index += ByteUtil.NUM_BYTES_IN_SHORT;
 
         byte[] systemIdByteData = ByteUtil.intToBytes(systemId, true);
-        System.arraycopy(systemIdByteData, 0, data, index, systemIdByteData.length);
+        System.arraycopy(systemIdByteData, ByteUtil.NUM_BYTES_IN_SHORT, data, index, systemIdByteData.length - ByteUtil.NUM_BYTES_IN_SHORT);
 
         return data;
     }

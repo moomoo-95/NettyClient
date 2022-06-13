@@ -2,19 +2,16 @@ package moomoo.netty.client.message;
 
 import moomoo.netty.client.message.base.TcpMessageHeader;
 import moomoo.netty.client.message.base.TcpLoginReqBody;
-import moomoo.netty.client.message.exception.MessageHeaderException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import moomoo.netty.client.message.exception.TcpMessageException;
 
 import static moomoo.netty.client.message.base.TcpMessageType.*;
 
 public class TcpMngLoginReqMessage {
-    private static final Logger log = LoggerFactory.getLogger(TcpMngLoginReqMessage.class);
 
     private final TcpMessageHeader header;
     private final TcpLoginReqBody body;
 
-    public TcpMngLoginReqMessage(byte[] data) throws MessageHeaderException {
+    public TcpMngLoginReqMessage(byte[] data) throws TcpMessageException {
         if (data.length >= HEADER_SIZE + LOGIN_REQ_BODY_SIZE) {
             int index = 0;
 
@@ -29,7 +26,7 @@ public class TcpMngLoginReqMessage {
         } else {
             this.header = null;
             this.body = null;
-            throw new MessageHeaderException("[TCP LOGIN REQ] Fail to create the Body. Data length: (" + data.length + ")");
+            throw new TcpMessageException("[TCP LOGIN REQ] Fail to create the Body. Data length: (" + data.length + ")");
         }
     }
 
