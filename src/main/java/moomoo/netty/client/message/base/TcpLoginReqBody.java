@@ -58,7 +58,7 @@ public class TcpLoginReqBody {
 
     @Override
     public String toString() {
-        return "TcpMngLoginReqBody{" +
+        return "TcpLoginReqBody{" +
                 "processArg=" + processArg +
                 ", index=" + index +
                 '}';

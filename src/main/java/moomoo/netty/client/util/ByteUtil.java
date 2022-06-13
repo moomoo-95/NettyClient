@@ -11,6 +11,7 @@ public class ByteUtil {
     public static final int NUM_BYTES_IN_SHORT = 2;
     public static final int NUM_BYTES_IN_INT = 4;
     public static final int NUM_BYTES_IN_LONG = 8;
+    public static final int NUM_BYTE = 1;
 
     private static final long[] maxValueCache = new long[64];
 

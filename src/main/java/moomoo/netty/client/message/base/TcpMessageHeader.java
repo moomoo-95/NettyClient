@@ -11,7 +11,6 @@ public class TcpMessageHeader {
     private final int msgId;        // unsigned 16 bite
     private final int systemId;     // unsigned 16 bite
 
-
     public TcpMessageHeader(byte[] data) throws TcpMessageException {
         if (data.length == HEADER_SIZE) {
             int index = 0;
@@ -91,7 +90,7 @@ public class TcpMessageHeader {
 
     @Override
     public String toString() {
-        return "TcpMngHeader{" +
+        return "TcpMessageHeader{" +
                 "length=" + length +
                 ", msgId=" + msgId +
                 ", systemId=" + systemId +

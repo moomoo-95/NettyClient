@@ -2,7 +2,10 @@ package moomoo.netty.client.command;
 
 import moomoo.netty.client.channel.NettyChannelManager;
 import moomoo.netty.client.command.handler.ControlCommandHandler;
-import moomoo.netty.client.message.TcpMngLoginReqMessage;
+import moomoo.netty.client.message.TcpDataRptMessage;
+import moomoo.netty.client.message.TcpHeartbeatReqMessage;
+import moomoo.netty.client.message.TcpLoginReqMessage;
+import moomoo.netty.client.message.base.TcpLoginReqBody;
 import moomoo.netty.client.util.ByteUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,8 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
-import static moomoo.netty.client.command.base.CommandType.COMMAND_LOGIN_REQ;
-import static moomoo.netty.client.command.base.CommandType.COMMAND_Q;
+import static moomoo.netty.client.command.base.CommandType.*;
 import static moomoo.netty.client.command.base.PrintMessage.*;
 
 /**
@@ -53,20 +55,40 @@ public class CommandServer implements Runnable {
      * command를 입력받고 어떤 command인지 파싱하는 메서드
      */
     public void commandInput(String inputCommand) {
+        int systemId = 0xbbbb;
+        long processArg = 0xaaaa;
+        long index = 1;
         switch (inputCommand) {
             case COMMAND_Q:
                 ControlCommandHandler.processQuitCommand();
                 break;
             case COMMAND_LOGIN_REQ:
-                int systemId = 0xbbbb;
-                long processArg = 0xaaaa;
-                long index = 1;
-                TcpMngLoginReqMessage loginReqMessage = new TcpMngLoginReqMessage(systemId, processArg, index);
+                TcpLoginReqMessage loginReqMessage = new TcpLoginReqMessage(systemId, processArg, index);
                 log.debug("{} {} {}", ByteUtil.intToBytes(systemId, true), ByteUtil.longToBytes(processArg, true), ByteUtil.longToBytes(index, true));
                 log.debug("login req msg : {}", loginReqMessage);
                 log.debug("login req byt : {}", loginReqMessage.getData());
 
                 NettyChannelManager.getInstance().getTcpClientChannel().sendMessage(loginReqMessage.getData());
+                break;
+            case COMMAND_HB:
+                TcpHeartbeatReqMessage heartbeatReqMessage = new TcpHeartbeatReqMessage(systemId);
+                log.debug("{}", ByteUtil.intToBytes(systemId, true));
+                log.debug("hb req msg : {}", heartbeatReqMessage);
+                log.debug("hb req byt : {}", heartbeatReqMessage.getData());
+
+                NettyChannelManager.getInstance().getTcpClientChannel().sendMessage(heartbeatReqMessage.getData());
+                break;
+            case COMMAND_DATA_RPT:
+                TcpDataRptMessage dataRptMessage = new TcpDataRptMessage(systemId, 10001, 9, 12, (short) 255);
+                log.debug("{} {} {} {} {}", ByteUtil.intToBytes(systemId, true),
+                        ByteUtil.longToBytes(10001, true),
+                        ByteUtil.longToBytes(9, true),
+                        ByteUtil.longToBytes(12, true),
+                        ByteUtil.shortToBytes((short) 255, true));
+                log.debug("data msg : {}", dataRptMessage);
+                log.debug("data byt : {}", dataRptMessage.getData());
+
+                NettyChannelManager.getInstance().getTcpClientChannel().sendMessage(dataRptMessage.getData());
                 break;
             default:
                 byte[] bytesMsg = inputCommand.getBytes(StandardCharsets.UTF_8);
