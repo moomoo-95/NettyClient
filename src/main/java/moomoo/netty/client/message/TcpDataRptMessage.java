@@ -3,6 +3,7 @@ package moomoo.netty.client.message;
 import moomoo.netty.client.message.base.TcpDataRptBody;
 import moomoo.netty.client.message.base.TcpMessageHeader;
 import moomoo.netty.client.message.exception.TcpMessageException;
+import moomoo.netty.client.util.ByteUtil;
 
 import static moomoo.netty.client.message.base.TcpMessageType.*;
 
@@ -12,7 +13,7 @@ public class TcpDataRptMessage {
     private final TcpDataRptBody body;
 
     public TcpDataRptMessage(byte[] data) throws TcpMessageException {
-        if (data.length == HEADER_SIZE + DATA_RPT_BODY_SIZE) {
+        if (data.length >= HEADER_SIZE + DATA_RPT_BODY_MIN_SIZE) {
             int index = 0;
 
             byte[] headerByteData = new byte[HEADER_SIZE];
@@ -20,7 +21,7 @@ public class TcpDataRptMessage {
             this.header = new TcpMessageHeader(headerByteData);
             index += headerByteData.length;
 
-            byte[] bodyByteData = new byte[DATA_RPT_BODY_SIZE];
+            byte[] bodyByteData = new byte[data.length - HEADER_SIZE];
             System.arraycopy(data, index, bodyByteData, 0, bodyByteData.length);
             this.body = new TcpDataRptBody(bodyByteData);
         } else {
@@ -30,9 +31,9 @@ public class TcpDataRptMessage {
         }
     }
 
-    public TcpDataRptMessage(int systemId, long aiifPort, long aiifLen, long aiifSeq, short pcm) {
-        this.header = new TcpMessageHeader(HEADER_SIZE + DATA_RPT_BODY_SIZE, DATA_RPT_ID, systemId);
+    public TcpDataRptMessage(int systemId, long aiifPort, long aiifLen, long aiifSeq, byte[] pcm) {
         this.body = new TcpDataRptBody(aiifPort, aiifLen, aiifSeq, pcm);
+        this.header = new TcpMessageHeader(HEADER_SIZE + ByteUtil.NUM_BYTES_IN_INT + body.getAiifLen(), DATA_RPT_ID, systemId);
     }
 
     public byte[] getData() {
@@ -47,6 +48,10 @@ public class TcpDataRptMessage {
         System.arraycopy(bodyByteData, 0, data, index, bodyByteData.length);
 
         return data;
+    }
+
+    public TcpDataRptBody getBody() {
+        return body;
     }
 
     @Override

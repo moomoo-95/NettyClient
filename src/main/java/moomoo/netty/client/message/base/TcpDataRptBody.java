@@ -10,10 +10,10 @@ public class TcpDataRptBody {
     private final long aiifPort;  // unsigned 32 bite
     private final long aiifLen;   // unsigned 32 bite
     private final long aiifSeq;   // unsigned 32 bite
-    private final short pcm;       // unsigned 8 bite
+    private final byte[] pcm;
 
     public TcpDataRptBody(byte[] data) throws TcpMessageException {
-        if (data.length == DATA_RPT_BODY_SIZE) {
+        if (data.length >= DATA_RPT_BODY_MIN_SIZE) {
             int index = 0;
 
             byte[] aiifPortByteData = new byte[ByteUtil.NUM_BYTES_IN_LONG];
@@ -31,19 +31,18 @@ public class TcpDataRptBody {
             this.aiifSeq = ByteUtil.bytesToLong(aiifSeqByteData, true);
             index += ByteUtil.NUM_BYTES_IN_INT;
 
-            byte[] pcmByteData = new byte[ByteUtil.NUM_BYTES_IN_SHORT];
-            System.arraycopy(data, index, pcmByteData, ByteUtil.NUM_BYTE, pcmByteData.length - ByteUtil.NUM_BYTE);
-            this.pcm = ByteUtil.bytesToShort(pcmByteData, true);
+            this.pcm = new byte[ (int) aiifLen - ByteUtil.NUM_BYTES_IN_LONG];
+            System.arraycopy(data, index, pcm, 0, data.length - index);
         } else {
             this.aiifPort = -1;
             this.aiifLen = -1;
             this.aiifSeq = -1;
-            this.pcm = -1;
+            this.pcm = null;
             throw new TcpMessageException("[TCP DATA RPT BODY] Fail to create the Body. Data length: (" + data.length + ")");
         }
     }
 
-    public TcpDataRptBody(long aiifPort, long aiifLen, long aiifSeq, short pcm) {
+    public TcpDataRptBody(long aiifPort, long aiifLen, long aiifSeq, byte[] pcm) {
         this.aiifPort = aiifPort;
         this.aiifLen = aiifLen;
         this.aiifSeq = aiifSeq;
@@ -51,7 +50,7 @@ public class TcpDataRptBody {
     }
 
     public byte[] getData() {
-        byte[] data = new byte[DATA_RPT_BODY_SIZE];
+        byte[] data = new byte[ByteUtil.NUM_BYTES_IN_INT + getAiifLen()];
         int index = 0;
 
         byte[] aiifPortByteData = ByteUtil.longToBytes(aiifPort, true);
@@ -66,8 +65,7 @@ public class TcpDataRptBody {
         System.arraycopy(aiifSeqByteData, ByteUtil.NUM_BYTES_IN_INT, data, index, aiifSeqByteData.length - ByteUtil.NUM_BYTES_IN_INT);
         index += ByteUtil.NUM_BYTES_IN_INT;
 
-        byte[] pcmByteData = ByteUtil.shortToBytes(pcm, true);
-        System.arraycopy(pcmByteData, ByteUtil.NUM_BYTE, data, index, pcmByteData.length - ByteUtil.NUM_BYTE);
+        System.arraycopy(pcm, 0, data, index, pcm.length);
 
         return data;
     }
@@ -76,15 +74,15 @@ public class TcpDataRptBody {
         return aiifPort;
     }
 
-    public long getAiifLen() {
-        return aiifLen;
+    public int getAiifLen() {
+        return (int) aiifLen;
     }
 
-    public long getAiifSeq() {
-        return aiifSeq;
+    public int getAiifSeq() {
+        return (int) aiifSeq;
     }
 
-    public short getPcm() {
+    public byte[] getPcm() {
         return pcm;
     }
 
@@ -94,7 +92,8 @@ public class TcpDataRptBody {
                 "aiifPort=" + aiifPort +
                 ", aiifLen=" + aiifLen +
                 ", aiifSeq=" + aiifSeq +
-                ", pcm=" + pcm +
+                ", pcm=" + pcm.toString() +
                 '}';
     }
 }
+

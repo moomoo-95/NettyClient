@@ -27,6 +27,8 @@ public class CommandServer implements Runnable {
 
     private boolean isQuit = false;
 
+    private long aiifSeq = 1;
+
     public CommandServer() {
         scanner = new Scanner(System.in);
     }
@@ -79,12 +81,12 @@ public class CommandServer implements Runnable {
                 NettyChannelManager.getInstance().getTcpClientChannel().sendMessage(heartbeatReqMessage.getData());
                 break;
             case COMMAND_DATA_RPT:
-                TcpDataRptMessage dataRptMessage = new TcpDataRptMessage(systemId, 10001, 9, 12, (short) 255);
-                log.debug("{} {} {} {} {}", ByteUtil.intToBytes(systemId, true),
+                TcpDataRptMessage dataRptMessage = new TcpDataRptMessage(systemId, 10001, 8 + pcmTestData.length, aiifSeq, pcmTestData);
+                aiifSeq++;
+                log.debug("{} {} {} {}", ByteUtil.intToBytes(systemId, true),
                         ByteUtil.longToBytes(10001, true),
                         ByteUtil.longToBytes(9, true),
-                        ByteUtil.longToBytes(12, true),
-                        ByteUtil.shortToBytes((short) 255, true));
+                        ByteUtil.longToBytes(12, true));
                 log.debug("data msg : {}", dataRptMessage);
                 log.debug("data byt : {}", dataRptMessage.getData());
 
@@ -100,4 +102,27 @@ public class CommandServer implements Runnable {
     public void stop() {
         isQuit = true;
     }
+
+    private static byte[] pcmTestData = new byte[] {
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+    };
 }

@@ -8,7 +8,7 @@ public class TcpMessageType {
 
     public static final int HEADER_SIZE = 8;           // unsigned 16 byte * 4
     public static final int LOGIN_REQ_BODY_SIZE = 8;   // unsigned 32 byte * 2
-    public static final int DATA_RPT_BODY_SIZE = 13;   // unsigned 32 byte * 3 + unsigned 8 byte * 1
+    public static final int DATA_RPT_BODY_MIN_SIZE = 12;   // unsigned 32 byte * 3
 
     public static final int FRAME_START = 0xfefe;
 
