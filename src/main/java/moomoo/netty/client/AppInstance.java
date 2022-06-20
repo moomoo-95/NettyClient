@@ -12,6 +12,10 @@ public class AppInstance {
     private DefaultConfig defaultConfig;
     private CommandServer commandServer;
 
+    private static final long SYSTEM_ID = ProcessHandle.current().pid();
+
+    private boolean isLogin = false;
+
     public AppInstance() {
         // nothing
     }
@@ -38,5 +42,17 @@ public class AppInstance {
 
     public void setCommandServer() {
         this.commandServer = new CommandServer();
+    }
+
+    public int getSystemId() {
+        return (int) SYSTEM_ID;
+    }
+
+    public boolean isLogin() {
+        return isLogin;
+    }
+
+    public void setLogin(boolean login) {
+        isLogin = login;
     }
 }

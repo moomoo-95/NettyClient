@@ -15,6 +15,7 @@ package moomoo.netty.client.service;
 import moomoo.netty.client.AppInstance;
 import moomoo.netty.client.channel.NettyChannelManager;
 import moomoo.netty.client.config.DefaultConfig;
+import moomoo.netty.client.service.scheduler.IntervalTaskManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,8 +87,11 @@ public class ServiceManager {
         nettyChannelManager = NettyChannelManager.getInstance();
         nettyChannelManager.startTcpClientChannel(defaultConfig.getCommonTargetIp(), defaultConfig.getCommonTargetPort());
 
+        IntervalTaskManager.getInstance().init().start();
+
         instance.setCommandServer();
         instance.getCommandServer().run();
+
     }
 
 
@@ -95,6 +99,8 @@ public class ServiceManager {
      * Finalizes all the resources
      */
     public void stopService() {
+        IntervalTaskManager.getInstance().stop();
+
         instance.getCommandServer().stop();
 
         nettyChannelManager.stopTcpClientChannel();

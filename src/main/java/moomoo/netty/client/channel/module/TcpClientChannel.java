@@ -123,8 +123,7 @@ public class TcpClientChannel {
         if (channel != null) {
             try {
                 channel.writeAndFlush(byteBuf);
-                String logMessage = byteBuf.toString(StandardCharsets.UTF_8);
-                logger.debug("({}) ({}:{}) Send the request. [\n{}\n]", channelId, targetIp, targetPort, message);
+//                logger.debug("({}) ({}:{}) Send the request. [\n{}\n]", channelId, targetIp, targetPort, message);
             } catch (Exception e) {
                 logger.error("TcpClientChannel.sendMessage.Exception ", e);
             }
