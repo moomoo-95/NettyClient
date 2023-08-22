@@ -1,20 +1,9 @@
-/*
- * Copyright (C) 2018. Uangel Corp. All rights reserved.
- *
- */
-
-/**
- * Service Manager
- *
- * @file ServiceManager.java
- * @author Tony Lim
- */
-
 package moomoo.netty.client.service;
 
 import moomoo.netty.client.AppInstance;
 import moomoo.netty.client.channel.NettyChannelManager;
-import moomoo.netty.client.config.DefaultConfig;
+import moomoo.netty.client.command.CommandServer;
+import moomoo.netty.client.config.UserConfig;
 import moomoo.netty.client.service.scheduler.IntervalTaskManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +21,7 @@ public class ServiceManager {
 
 
     private static AppInstance instance = AppInstance.getInstance();
-    private static DefaultConfig defaultConfig = instance.getDefaultConfig();
+    private static UserConfig userConfig = instance.getUserConfig();
 
     private NettyChannelManager nettyChannelManager;
 
@@ -46,7 +35,12 @@ public class ServiceManager {
      * Reads a config file in the constructor
      */
     public ServiceManager() {
-        // nothing
+        try {
+            userConfig = instance.getUserConfig();
+            userConfig.init(instance.getConfigPath());
+        } catch (Exception e){
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -68,7 +62,7 @@ public class ServiceManager {
 
         while (!isQuit) {
             try {
-                Thread.sleep(20);
+                Thread.sleep(1000);
             } catch (Exception e) {
                 log.error("ServiceManager.loop.Exception ",e);
                 Thread.currentThread().interrupt();
@@ -78,20 +72,20 @@ public class ServiceManager {
         log.error("Process End");
     }
 
-    private void startService() {
+    private ServiceManager startService() {
         log.info("Netty Client Process Start.");
 
         // System lock
         systemLock();
 
         nettyChannelManager = NettyChannelManager.getInstance();
-        nettyChannelManager.startTcpClientChannel(defaultConfig.getCommonTargetIp(), defaultConfig.getCommonTargetPort());
-
+        nettyChannelManager.startServer(userConfig.getCommonLocalIp(), userConfig.getCommonLocalPort());
         IntervalTaskManager.getInstance().init().start();
 
-        instance.setCommandServer();
+        instance.setCommandServer(new CommandServer());
         instance.getCommandServer().run();
 
+        return this;
     }
 
 
@@ -103,7 +97,7 @@ public class ServiceManager {
 
         instance.getCommandServer().stop();
 
-        nettyChannelManager.stopTcpClientChannel();
+        nettyChannelManager.stopServer();
         log.info("Netty Client Process End.");
     }
 

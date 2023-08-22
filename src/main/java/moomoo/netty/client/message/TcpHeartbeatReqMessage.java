@@ -1,9 +1,10 @@
 package moomoo.netty.client.message;
 
-import moomoo.netty.client.message.exception.TcpMessageException;
 import moomoo.netty.client.message.base.TcpMessageHeader;
+import moomoo.netty.client.message.exception.TcpMessageException;
 
-import static moomoo.netty.client.message.base.TcpMessageType.*;
+import static moomoo.netty.client.message.base.TcpMessageType.HEADER_SIZE;
+import static moomoo.netty.client.message.base.TcpMessageType.HEARTBEAT_REQ_ID;
 
 public class TcpHeartbeatReqMessage {
 

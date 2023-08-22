@@ -1,15 +1,12 @@
 package moomoo.netty.client.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.ini4j.Ini;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
-public class DefaultConfig {
-
-    private static final Logger log = LoggerFactory.getLogger(DefaultConfig.class);
-
+@Slf4j
+public class UserConfig {
     private static final String CONFIG_LOG = "Load [{}] config...(OK)";
 
     private Ini ini = null;
@@ -36,7 +33,9 @@ public class DefaultConfig {
     // NETTY
     private int nettyRecvBufSize = 0;
 
-    public DefaultConfig(String configPath) {
+    public UserConfig() { /* ignore */ }
+
+    public void init(String configPath){
         File iniFile = new File(configPath);
         if (!iniFile.isFile() || !iniFile.exists()) {
             log.warn("Not found the config path. (path={})", configPath);

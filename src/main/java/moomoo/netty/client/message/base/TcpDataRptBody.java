@@ -3,7 +3,7 @@ package moomoo.netty.client.message.base;
 import moomoo.netty.client.message.exception.TcpMessageException;
 import moomoo.netty.client.util.ByteUtil;
 
-import static moomoo.netty.client.message.base.TcpMessageType.*;
+import static moomoo.netty.client.message.base.TcpMessageType.DATA_RPT_BODY_MIN_SIZE;
 
 public class TcpDataRptBody {
 
